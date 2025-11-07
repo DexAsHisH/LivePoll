@@ -1,0 +1,39 @@
+services:
+  - type: redis
+    name: livepoll-redis
+    plan: starter 
+    ipAllowList: [] 
+    
+  - type: web
+    name: livepoll-backend
+    runtime: docker
+    dockerfilePath: ./apps/http-backend/Dockerfile
+    dockerContext: .
+    plan: starter
+    branch: main
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false 
+      - key: DATABASE_NEON_URL
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: livepoll-redis
+          property: connectionString
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: livepoll-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: livepoll-redis
+          property: port
+    buildFilter:
+      paths:
+        - apps/http-backend/**
+        - packages/**
