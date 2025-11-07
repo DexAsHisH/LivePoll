@@ -15,7 +15,7 @@ const Home = () => {
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-const WS_URL = import.meta.env.VITE_WS_URL || 'wss://localhost:3000';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
 
   const connectWebSocket = () => {
     try {
@@ -132,7 +132,7 @@ const WS_URL = import.meta.env.VITE_WS_URL || 'wss://localhost:3000';
         wsRef.current.close();
       }
     };
-  });
+  }, []);
 
   const handleCreatePoll = async (newPoll: Poll) => {
     try {
