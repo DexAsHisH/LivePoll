@@ -19,7 +19,7 @@ import type {
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: 'https://live-poll-phi.vercel.app',
+  origin: ['https://live-poll-phi.vercel.app', 'http://localhost:5173'],
   credentials: true
 }));
 
