@@ -334,12 +334,6 @@ const ActivePolls = ({
                     </p>
                   </div>
                 </div>
-
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <span className="text-xs text-gray-400">
-                    Poll ID: {poll.id}
-                  </span>
-                </div>
               </div>
             )}
 
