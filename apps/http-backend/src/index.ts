@@ -18,7 +18,10 @@ import type {
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'https://live-poll-phi.vercel.app',
+  credentials: true
+}));
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
