@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: livepoll-backend
+    env: docker
+    plan: free
+    dockerfilePath: ./apps/http-backend/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_NEON_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+    autoDeploy: true
