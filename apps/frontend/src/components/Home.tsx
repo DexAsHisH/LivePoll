@@ -14,9 +14,12 @@ const Home = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
+
   const connectWebSocket = () => {
     try {
-      const ws = new WebSocket('ws://localhost:3000');
+      const ws = new WebSocket(WS_URL);
       
       ws.onopen = () => {
         console.log(' WebSocket connected');
@@ -102,7 +105,7 @@ const Home = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('http://localhost:3000/polls');
+      const response = await axios.get(`${API_URL}/polls`);
       
       if (response.data && Array.isArray(response.data)) {
         setPolls(response.data);
@@ -133,7 +136,7 @@ const Home = () => {
 
   const handleCreatePoll = async (newPoll: Poll) => {
     try {
-      await axios.post('http://localhost:3000/polls', {
+      await axios.post(`${API_URL}/polls`, {
         question: newPoll.question,
         options: newPoll.options.map(option => ({ text: option.text }))
       });
@@ -147,7 +150,7 @@ const Home = () => {
 
   const handleVote = async (_pollId: string, optionId: string) => {
 
-    const response = await axios.post('http://localhost:3000/votes', {
+    const response = await axios.post(`${API_URL}/votes`, {
       optionId
     });
 
@@ -170,7 +173,7 @@ const Home = () => {
   };
 
   const handleDelete = async (pollId: string) => {
-    await axios.delete(`http://localhost:3000/polls/${pollId}`);
+    await axios.delete(`${API_URL}/polls/${pollId}`);
   };
 
   const totalVotes = polls.reduce((sum, poll) => 
