@@ -1,0 +1,18 @@
+{
+  "name": "@repo/type-schema",
+  "version": "1.0.0",
+  "description": "",
+  "main": "types.ts",
+  "types": "types.ts",
+  "exports": {
+    ".": "./types.ts",
+    "./types": "./types.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}
