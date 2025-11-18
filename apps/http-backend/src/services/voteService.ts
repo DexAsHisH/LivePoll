@@ -59,21 +59,16 @@ export class VoteService {
         if (votesToSync === 0) return;
 
         try {
-            // 2. SYNC: Update the database first
+
             await prismaClient.option.update({
                 where: { id: optionId },
                 data: { votes: { increment: votesToSync } },
             });
 
-            // 3. DECREMENT: Safely remove ONLY what we synced
-            // If new votes came in during step 2, they stay in Redis!
             await redis.decrby(key, votesToSync);
 
             console.log(`✅ Synced ${votesToSync} votes for ${optionId}`);
         } catch (error) {
-            // If DB fails, we simply do nothing. 
-            // The votes remain in Redis and will be picked up next time.
-            // No complex restore logic needed!
             console.error(`Failed to sync ${optionId}, retrying next cycle.`);
         }
     }));
