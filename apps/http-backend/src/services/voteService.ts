@@ -47,46 +47,37 @@ export class VoteService {
   }
 
   static async syncVotesToDatabase(): Promise<void> {
-    try {
-      const keys = await redis.keys(`${VOTE_KEY_PREFIX}*`);
+    const keys = await redis.keys(`${VOTE_KEY_PREFIX}*`); 
+    if (keys.length === 0) return;
 
-      if (keys.length === 0) {
-        return;
-      }
-
-      console.log(`🔄 Syncing ${keys.length} vote counters to database...`);
-
-      for (const key of keys) {
+    await Promise.all(keys.map(async (key) => {
         const optionId = key.replace(VOTE_KEY_PREFIX, "");
-        const pendingVotes = await redis.get(key);
+        
+        const currentVotes = await redis.get(key);
+        const votesToSync = currentVotes ? parseInt(currentVotes) : 0;
 
-        if (!pendingVotes || parseInt(pendingVotes) === 0) {
-          continue;
-        }
-
-        const votesToSync = parseInt(pendingVotes);
+        if (votesToSync === 0) return;
 
         try {
-          await prismaClient.option.update({
-            where: { id: optionId },
-            data: {
-              votes: { increment: votesToSync },
-            },
-          });
+            // 2. SYNC: Update the database first
+            await prismaClient.option.update({
+                where: { id: optionId },
+                data: { votes: { increment: votesToSync } },
+            });
 
-          // Clear the pending votes counter
-          await redis.del(key);
+            // 3. DECREMENT: Safely remove ONLY what we synced
+            // If new votes came in during step 2, they stay in Redis!
+            await redis.decrby(key, votesToSync);
 
-          console.log(`✅ Synced ${votesToSync} votes for option ${optionId}`);
+            console.log(`✅ Synced ${votesToSync} votes for ${optionId}`);
         } catch (error) {
-          console.error(`Failed to sync votes for option ${optionId}:`, error);
+            // If DB fails, we simply do nothing. 
+            // The votes remain in Redis and will be picked up next time.
+            // No complex restore logic needed!
+            console.error(`Failed to sync ${optionId}, retrying next cycle.`);
         }
-      }
-    } catch (error) {
-      console.error(" Error in syncVotesToDatabase:", error);
-    }
-  }
-
+    }));
+}
   // Clear Redis cache for a poll
   static async clearPollCache(pollId: string): Promise<void> {
     const cacheKey = `${POLL_CACHE_PREFIX}${pollId}`;

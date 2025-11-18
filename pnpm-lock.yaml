@@ -113,19 +113,6 @@ importers:
         specifier: workspace:*
         version: link:../../packages/typescript-config
 
-  apps/ws-backend:
-    dependencies:
-      '@types/ws':
-        specifier: ^8.18.1
-        version: 8.18.1
-      ws:
-        specifier: ^8.18.3
-        version: 8.18.3
-    devDependencies:
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
-
   packages/db:
     dependencies:
       '@prisma/client':
